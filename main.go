@@ -76,9 +76,11 @@ func main() {
 	}
 	fmt.Println("Done!")
 
+	piVal := truncatePi(piList[1], *epsPtr)
+
 	fmt.Printf("\nValue of epsilon to compare to: %.12f\n", *epsPtr)
 	fmt.Printf("Number (N) of terms required to reach that: %d\n", N)
-	fmt.Printf("Value of pi(%d): %.12f\n", N, piList[1])
+	fmt.Printf("Value of pi(%d): %.12f\n", N, piVal)
 }
 
 /*
@@ -102,7 +104,7 @@ func piSummation(N int, kStart int, resultStart float64) [2]float64 {
 	for k := kStart; k <= N; k++ {
 		result[0] = result[1]
 		kFloat := float64(k)
-		result[1] += (math.Pow(-1.0, kFloat+float64(1.0))) / (float64(0.5)*kFloat - float64(0.25))
+		result[1] += math.Pow(-1.0, float64(kFloat+1.0)) / (float64(0.5)*kFloat - float64(0.25))
 		/*
 			That last line is a bit funky because we have to force Go to use high-precision
 			floating-point numbers if you are using static numbers (i.e 0.25).
@@ -118,4 +120,22 @@ func piSummation(N int, kStart int, resultStart float64) [2]float64 {
 */
 func epsilon(piList [2]float64) float64 {
 	return math.Abs(piList[1]-piList[0]) / piList[0]
+}
+
+/*
+	Cleans up the value of pi so that it's easy to determine the last valid digit in
+	the value.
+*/
+func truncatePi(piVal float64, residual float64) float64 {
+	// Determine how many decimal places are being used by residual
+	count := 0
+	for residual < 1.0 {
+		count++
+		residual *= 10
+	}
+	decimalPlace := math.Pow10(count)
+
+	cleanPi := math.Round(piVal*decimalPlace) / decimalPlace
+
+	return cleanPi
 }
