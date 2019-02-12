@@ -13,3 +13,6 @@
 
 # Built snaps
 *.snap
+
+# KDE file manager stuff
+.directory
